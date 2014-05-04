@@ -17,6 +17,37 @@ class FavoriteManagerTestCase(TestCase):
         fav = Favorite.objects.create_favorite(jeff, vera)
         self.assertEqual(1, fav.pk)
 
+    def test_del_favorite(self):
+        jeff = User.objects.create_user('jeff', 'bbmyth@gmail.com')
+        vinky = User.objects.create_user('vinky', 'vinky@test.com')
+        vera = User.objects.create_user('vera', 'vera@test.com')
+        Favorite.objects.create_favorite(jeff, vinky)
+        Favorite.objects.create_favorite(jeff, vera)
+
+        Favorite.objects.del_favorite(jeff, vinky)
+        favorites = Favorite.objects.favorites_of_user(jeff)
+        self.assertEqual(1, len(favorites))
+
+        Favorite.objects.del_favorite(jeff, vinky)
+        favorites = Favorite.objects.favorites_of_user(jeff)
+        self.assertEqual(1, len(favorites))
+
+        favorites = Favorite.objects.favorites_of_user(jeff)
+        Favorite.objects.del_favorite(jeff, vera)
+        self.assertEqual(0, len(favorites))
+
+    def test_favorites_obj_of_user(self):
+        jeff = User.objects.create_user('jeff', 'bbmyth@gmail.com')
+        vinky = User.objects.create_user('vinky', 'vinky@test.com')
+        vera = User.objects.create_user('vera', 'vera@test.com')
+        Favorite.objects.create_favorite(jeff, vinky)
+        Favorite.objects.create_favorite(jeff, vera)
+
+        favorites = Favorite.objects.favorites_obj_of_user(jeff, vinky)
+        self.assertEqual(1, len(favorites))
+        self.assertEqual(vinky.pk, favorites[0].object_id)
+
+
     def test_favorite_for_obj(self):
         jeff = User.objects.create_user('jeff', 'bbmyth@gmail.com')
         vinky = User.objects.create_user('vinky', 'vinky@test.com')
